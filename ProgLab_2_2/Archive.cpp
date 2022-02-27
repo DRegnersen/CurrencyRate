@@ -5,6 +5,10 @@ void Archive::add(const unsigned long long& number) {
     _size_ = _capacity_;
 
     for (size_t i = 0; i < number; i++) {
+        if (!_prev_.toString().contains("https:")) {
+            _prev_ = QUrl("https:" + _prev_.toString());
+        }
+
         CurrencyRate rate(_prev_);
         rate.validateRate();
 
@@ -12,7 +16,7 @@ void Archive::add(const unsigned long long& number) {
 
         _prev_ = rate.get_PreviousURL();
 
-        _timer_.start(500);
+        _timer_.start(250);
         _timer_.stop();
     }
 }
@@ -22,6 +26,19 @@ Archive::Archive(QUrl url, unsigned long long size) {
     _prev_ = url;
 
     add(size);
+}
+
+Archive& Archive::operator=(const Archive& other) {
+    _rates_.clear();
+    _prev_ = other._prev_;
+    _size_ = other._size_;
+    _capacity_ = other._capacity_;
+
+    for (const CurrencyRate& rate : other._rates_) {
+        _rates_.push_back(rate);
+    }
+
+    return *this;
 }
 
 CurrencyRate& Archive::operator[](const unsigned long long& idx) {

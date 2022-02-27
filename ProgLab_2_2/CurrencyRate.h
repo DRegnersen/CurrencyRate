@@ -15,6 +15,7 @@ class CurrencyRate : public QObject {
    private:
     QNetworkAccessManager *_manager_;
     QEventLoop _waiting_;
+    int _error_code_;
 
     QString _Date_;
     QString _PreviousDate_;
@@ -46,6 +47,8 @@ class CurrencyRate : public QObject {
     QUrl get_PreviousURL() const;
 
     QString get_Timestamp() const;
+
+    int error() const;
 };
 
 #endif  // CURRENCYRATE_H

@@ -26,5 +26,6 @@ class MainWindow : public QMainWindow {
    private:
     Ui::MainWindow *ui;
     DynChartWidget *chart = nullptr;
+    Archive _cash_;
 };
 #endif  // MAINWINDOW_H

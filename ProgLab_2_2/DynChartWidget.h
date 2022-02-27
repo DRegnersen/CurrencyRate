@@ -3,11 +3,12 @@
 
 #define PERIOD 14
 
+#include <QChart>
 #include <QChartView>
-#include <QDate>
 #include <QDateTime>
 #include <QDateTimeAxis>
 #include <QLineSeries>
+#include <QString>
 #include <QValueAxis>
 
 #include "Archive.h"
@@ -22,7 +23,7 @@ class DynChartWidget : public QChartView {
     QValueAxis* _axis_y_;
 
    public:
-    DynChartWidget(const int& idx);
+    DynChartWidget(const int& idx, Archive& cash);
 };
 
 #endif  // DYNCHARTWIDGET_H

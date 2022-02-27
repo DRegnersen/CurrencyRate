@@ -1,7 +1,12 @@
 #include "DynChartWidget.h"
 
-DynChartWidget::DynChartWidget(const int& idx) {
-    _archive_.setSize(PERIOD);
+DynChartWidget::DynChartWidget(const int& idx, Archive& cash) {
+    if (cash.isEmpty()) {
+        _archive_.setSize(PERIOD);
+        cash = _archive_;
+    } else {
+        _archive_ = cash;
+    }
     _chart_ = new QChart;
 
     // X-axis setting
@@ -12,7 +17,7 @@ DynChartWidget::DynChartWidget(const int& idx) {
     // Y-axis setting
     _axis_y_ = new QValueAxis;
     _axis_y_->setLabelFormat("%i");
-    _axis_y_->setTitleText(_archive_[0].at(idx).get_CharCode());
+    _axis_y_->setTitleText(_archive_[0].at(idx).get_Name());
 
     _chart_->addAxis(_axis_x_, Qt::AlignBottom);
     _chart_->addAxis(_axis_y_, Qt::AlignLeft);
@@ -34,4 +39,5 @@ DynChartWidget::DynChartWidget(const int& idx) {
 
     _chart_->addSeries(_series_);
     _chart_->setTitle(_archive_[0].at(idx).get_CharCode() + " dynamics");
+    this->setChart(_chart_);
 }

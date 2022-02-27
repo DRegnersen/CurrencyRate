@@ -29,5 +29,6 @@ void MainWindow::showDynamics(const QModelIndex &idx) {
     }
 
     delete chart;
-    chart = new DynChartWidget(idx.row());
+    chart = new DynChartWidget(idx.row(), _cash_);
+    chart->show();
 }

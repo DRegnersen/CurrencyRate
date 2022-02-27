@@ -11,16 +11,19 @@
 
 class Archive {
    private:
+    QTimer _timer_;
+
     QVector<CurrencyRate> _rates_;
     QUrl _prev_;
     unsigned long long _size_;
     unsigned long long _capacity_;
-    QTimer _timer_;
 
     void add(const unsigned long long& number);
 
    public:
     Archive(QUrl url = MAINURL, unsigned long long size = 0);
+
+    Archive& operator=(const Archive& other);
 
     CurrencyRate& operator[](const unsigned long long& idx);
 

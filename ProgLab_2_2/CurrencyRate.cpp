@@ -33,9 +33,7 @@ CurrencyRate::CurrencyRate(QUrl url, QObject *parent) : QObject(parent) {
 }
 
 void CurrencyRate::parseJson(QNetworkReply *reply) {
-    int error_code;
-    if (!(error_code = reply->error())) {
-        qDebug() << reply->url();
+    if (!(_error_code_ = reply->error())) {
         QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
         QJsonObject root = document.object();
         QJsonObject js_valute = root.value(root.keys().at(4)).toObject();
@@ -52,8 +50,6 @@ void CurrencyRate::parseJson(QNetworkReply *reply) {
         }
     } else {
         qDebug() << "<CurrencyRate> Reply was not transmitted";
-        qDebug() << reply->url();
-        qDebug() << error_code;
     }
     reply->deleteLater();
 }
@@ -87,3 +83,5 @@ QString CurrencyRate::get_PreviousDate() const { return _PreviousDate_; }
 QUrl CurrencyRate::get_PreviousURL() const { return _PreviousURL_; }
 
 QString CurrencyRate::get_Timestamp() const { return _Timestamp_; }
+
+int CurrencyRate::error() const { return _error_code_; }
