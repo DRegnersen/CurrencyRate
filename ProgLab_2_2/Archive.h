@@ -2,6 +2,7 @@
 #define ARCHIVE_H
 
 #define MAINURL QUrl("https://www.cbr-xml-daily.ru/daily_json.js")
+#define INTERVAL 200
 
 #include <QTimer>
 #include <QUrl>

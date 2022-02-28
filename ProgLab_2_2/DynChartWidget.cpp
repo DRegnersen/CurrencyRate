@@ -7,20 +7,6 @@ DynChartWidget::DynChartWidget(const int& idx, Archive& cash) {
     } else {
         _archive_ = cash;
     }
-    _chart_ = new QChart;
-
-    // X-axis setting
-    _axis_x_ = new QDateTimeAxis;
-    _axis_x_->setFormat("dd-MMM");
-    _axis_x_->setTitleText("All period");
-
-    // Y-axis setting
-    _axis_y_ = new QValueAxis;
-    _axis_y_->setLabelFormat("%i");
-    _axis_y_->setTitleText(_archive_[0].at(idx).get_Name());
-
-    _chart_->addAxis(_axis_x_, Qt::AlignBottom);
-    _chart_->addAxis(_axis_y_, Qt::AlignLeft);
 
     _series_ = new QLineSeries;
 
@@ -37,7 +23,25 @@ DynChartWidget::DynChartWidget(const int& idx, Archive& cash) {
                          _archive_[i].at(idx).get_Value());
     }
 
+    _chart_ = new QChart;
     _chart_->addSeries(_series_);
+    _chart_->legend()->hide();
     _chart_->setTitle(_archive_[0].at(idx).get_CharCode() + " dynamics");
+
+    // X-axis setting
+    _axis_x_ = new QDateTimeAxis;
+    _axis_x_->setFormat("dd-MMM");
+    _axis_x_->setTitleText("All period");
+    _chart_->addAxis(_axis_x_, Qt::AlignBottom);
+    _series_->attachAxis(_axis_x_);
+
+    // Y-axis setting
+    _axis_y_ = new QValueAxis;
+    _axis_y_->setLabelFormat("%d");
+    _axis_y_->setTitleText(_archive_[0].at(idx).get_Name());
+    _chart_->addAxis(_axis_y_, Qt::AlignLeft);
+    _series_->attachAxis(_axis_y_);
+
+    this->setRenderHint(QPainter::Antialiasing);
     this->setChart(_chart_);
 }

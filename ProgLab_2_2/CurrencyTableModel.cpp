@@ -46,7 +46,7 @@ QVariant CurrencyTableModel::data(const QModelIndex &idx, int role) const {
                     break;
                 }
                 case 6: {
-                    value = "Show";
+                    value = "Show...";
                     break;
                 }
             }

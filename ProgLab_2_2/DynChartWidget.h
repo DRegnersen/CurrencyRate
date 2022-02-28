@@ -1,7 +1,7 @@
 #ifndef DYNCHARTWIDGET_H
 #define DYNCHARTWIDGET_H
 
-#define PERIOD 14
+#define PERIOD 30
 
 #include <QChart>
 #include <QChartView>

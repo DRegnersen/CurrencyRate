@@ -13,11 +13,17 @@ void Archive::add(const unsigned long long& number) {
         rate.validateRate();
 
         _rates_.push_back(rate);
+        qDebug() << "<Archive> Downloading: " +
+                        QString::number(
+                            (int)(((double)(i + 1) / (double)number) * 100)) +
+                        "%";
 
         _prev_ = rate.get_PreviousURL();
 
-        _timer_.start(250);
-        _timer_.stop();
+        if (i != number - 1) {
+            _timer_.start(INTERVAL);
+            _timer_.stop();
+        }
     }
 }
 
