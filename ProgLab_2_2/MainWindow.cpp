@@ -29,6 +29,25 @@ void MainWindow::showDynamics(const QModelIndex &idx) {
     }
 
     delete chart;
+
+    QWidget *widget = new QWidget;
+    widget->setWindowTitle("Dynamics");
+
     chart = new DynChartWidget(idx.row(), _cash_);
-    chart->show();
+    spin_box = new QSpinBox;
+    spin_box->setMinimum(7);
+    spin_box->setMaximum(365);
+    spin_box->setValue(PERIOD);
+
+    connect(spin_box, &QSpinBox::editingFinished, this,
+            &MainWindow::updateChart);
+
+    layout = new QVBoxLayout;
+    layout->addWidget(chart);
+    layout->addWidget(spin_box);
+
+    widget->setLayout(layout);
+    widget->show();
 }
+
+void MainWindow::updateChart() { chart->refresh(spin_box->value(), _cash_); }

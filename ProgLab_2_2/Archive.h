@@ -15,6 +15,7 @@ class Archive {
     QTimer _timer_;
 
     QVector<CurrencyRate> _rates_;
+
     QUrl _prev_;
     unsigned long long _size_;
     unsigned long long _capacity_;
@@ -31,6 +32,10 @@ class Archive {
     unsigned long long size() const;
 
     void setSize(unsigned long long size);
+
+    double min(const int& idx);
+
+    double max(const int& idx);
 
     bool isEmpty();
 };
