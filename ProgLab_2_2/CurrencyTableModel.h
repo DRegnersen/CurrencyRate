@@ -12,7 +12,7 @@
 
 class CurrencyTableModel : public QAbstractListModel {
    private:
-    CurrencyRate _rate_;
+    CurrencyRate rate_;
 
    public:
     CurrencyTableModel(QObject *parent = nullptr);

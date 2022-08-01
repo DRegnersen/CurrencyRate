@@ -1,9 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#define MAINURL QUrl("https://www.cbr-xml-daily.ru/daily_json.js")
-#define PERIOD 30
-
 #include <QMainWindow>
 #include <QPushButton>
 #include <QSpinBox>
@@ -39,6 +36,6 @@ class MainWindow : public QMainWindow {
     QVBoxLayout *layout = nullptr;
     QWidget *widget = nullptr;
 
-    Archive _cash_;
+    Cache cache_;
 };
 #endif  // MAINWINDOW_H

@@ -1,64 +1,69 @@
 #include "DynChartWidget.h"
 
-DynChartWidget::DynChartWidget(const int& idx, Archive& cash) {
-    _idx_ = idx;
+DynChartWidget::DynChartWidget(const int& idx, Cache& cache) {
+    idx_ = idx;
 
-    if (cash.isEmpty()) {
-        _archive_.setSize(PERIOD);
-        cash = _archive_;
+    cache.load();
+
+    if (cache.isEmpty()) {
+        archive_.setSize(INITIAL_PERIOD);
+        cache.set_archive(archive_);
+        cache.save();
     } else {
-        _archive_ = cash;
+        archive_ = cache.get_archive();
+        archive_.refresh();
     }
 
-    _series_ = new QLineSeries;
+    series_ = new QLineSeries;
     populateSeries();
 
-    _chart_ = new QChart;
-    _chart_->addSeries(_series_);
-    _chart_->legend()->hide();
-    _chart_->setTitle(_archive_[0].at(_idx_).get_CharCode() + " dynamics");
+    chart_ = new QChart;
+    chart_->addSeries(series_);
+    chart_->legend()->hide();
+    chart_->setTitle(archive_[0].at(idx_).get_CharCode() + " dynamics");
 
     // X-axis setting
-    _axis_x_ = new QDateTimeAxis;
-    _axis_x_->setFormat("dd-MMM");
-    _axis_x_->setTitleText("All period");
-    _chart_->addAxis(_axis_x_, Qt::AlignBottom);
-    _series_->attachAxis(_axis_x_);
+    axis_x_ = new QDateTimeAxis;
+    axis_x_->setFormat("dd-MMM");
+    axis_x_->setTitleText("All period");
+    chart_->addAxis(axis_x_, Qt::AlignBottom);
+    series_->attachAxis(axis_x_);
 
     // Y-axis setting
-    _axis_y_ = new QValueAxis;
-    _axis_y_->setLabelFormat("%d");
-    _axis_y_->setTitleText(_archive_[0].at(_idx_).get_Name());
-    _chart_->addAxis(_axis_y_, Qt::AlignLeft);
-    _series_->attachAxis(_axis_y_);
+    axis_y_ = new QValueAxis;
+    axis_y_->setLabelFormat("%d");
+    axis_y_->setTitleText(archive_[0].at(idx_).get_Name());
+    chart_->addAxis(axis_y_, Qt::AlignLeft);
+    series_->attachAxis(axis_y_);
 
     this->setRenderHint(QPainter::Antialiasing);
-    this->setChart(_chart_);
+    this->setChart(chart_);
 }
 
 void DynChartWidget::populateSeries() {
     QDateTime date;
-    for (size_t i = 0; i < _archive_.size(); i++) {
-        date = QDateTime::fromString(_archive_[i].get_Date().left(10),
+    for (size_t i = 0; i < archive_.size(); i++) {
+        date = QDateTime::fromString(archive_[i].get_Date().left(10),
                                      "yyyy-MM-dd");
 
-        _series_->append(date.toMSecsSinceEpoch(),
-                         _archive_[i].at(_idx_).get_Value());
+        series_->append(date.toMSecsSinceEpoch(),
+                        archive_[i].at(idx_).get_Value());
     }
 }
 
-void DynChartWidget::refresh(int period, Archive& cash) {
-    _archive_.setSize(period);
-    cash = _archive_;
+void DynChartWidget::refresh(int period, Cache& cache) {
+    archive_.setSize(period);
+    cache.set_archive(archive_);
+    cache.save();
 
-    _series_->clear();
-    _axis_x_->setRange(
-        QDateTime::fromString(
-            _archive_[_archive_.size() - 1].get_Date().left(10), "yyyy-MM-dd"),
-        QDateTime::fromString(_archive_[0].get_Date().left(10), "yyyy-MM-dd"));
+    series_->clear();
+    axis_x_->setRange(
+        QDateTime::fromString(archive_[archive_.size() - 1].get_Date().left(10),
+                              "yyyy-MM-dd"),
+        QDateTime::fromString(archive_[0].get_Date().left(10), "yyyy-MM-dd"));
 
-    _axis_y_->setRange(std::max(_archive_.min(_idx_) - 3, 0.0),
-                       _archive_.max(_idx_) + 3);
+    axis_y_->setRange(std::max(archive_.min(idx_) - 3, 0.0),
+                      archive_.max(idx_) + 3);
     populateSeries();
 
     this->repaint();

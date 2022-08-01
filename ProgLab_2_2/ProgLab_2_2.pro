@@ -10,6 +10,7 @@ CONFIG += c++20
 
 SOURCES += \
     Archive.cpp \
+    Cache.cpp \
     Currency.cpp \
     CurrencyRate.cpp \
     CurrencyTableModel.cpp \
@@ -19,6 +20,7 @@ SOURCES += \
 
 HEADERS += \
     Archive.h \
+    Cache.h \
     Currency.h \
     CurrencyRate.h \
     CurrencyTableModel.h \

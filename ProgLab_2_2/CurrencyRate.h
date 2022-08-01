@@ -13,20 +13,25 @@
 
 class CurrencyRate : public QObject {
    private:
-    QNetworkAccessManager *_manager_;
-    QEventLoop _waiting_;
-    int _error_code_;
+    QNetworkAccessManager *manager_;
+    QEventLoop waiting_;
+    int error_code_;
 
-    QString _Date_;
-    QString _PreviousDate_;
-    QUrl _PreviousURL_;
-    QString _Timestamp_;
-    QVector<Currency> _Valute_;
+    QString Date_;
+    QString PreviousDate_;
+    QUrl PreviousURL_;
+    QString Timestamp_;
+    QVector<Currency> Valute_;
 
+   private slots:
     void parseJson(QNetworkReply *reply);
 
    public:
     CurrencyRate(QObject *parent = nullptr);
+
+    CurrencyRate(QString Date, QString PreviousDate, QUrl PreviousURL,
+                 QString Timestamp, QVector<Currency> Valute,
+                 QObject *parent = nullptr);
 
     CurrencyRate(const CurrencyRate &other, QObject *parent = nullptr);
 

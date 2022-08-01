@@ -9,6 +9,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
 
+    this->setWindowTitle("Currency Rate");
+
     CurrencyRate main_rate(MAINURL);
     main_rate.validateRate();
 
@@ -33,11 +35,11 @@ void MainWindow::showDynamics(const QModelIndex &idx) {
     QWidget *widget = new QWidget;
     widget->setWindowTitle("Dynamics");
 
-    chart = new DynChartWidget(idx.row(), _cash_);
+    chart = new DynChartWidget(idx.row(), cache_);
     spin_box = new QSpinBox;
-    spin_box->setMinimum(7);
-    spin_box->setMaximum(365);
-    spin_box->setValue(PERIOD);
+    spin_box->setMinimum(LOWER_PERIOD);
+    spin_box->setMaximum(UPPER_PERIOD);
+    spin_box->setValue(cache_.size());
 
     connect(spin_box, &QSpinBox::editingFinished, this,
             &MainWindow::updateChart);
@@ -50,4 +52,4 @@ void MainWindow::showDynamics(const QModelIndex &idx) {
     widget->show();
 }
 
-void MainWindow::updateChart() { chart->refresh(spin_box->value(), _cash_); }
+void MainWindow::updateChart() { chart->refresh(spin_box->value(), cache_); }

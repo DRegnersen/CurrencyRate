@@ -1,8 +1,6 @@
 #ifndef DYNCHARTWIDGET_H
 #define DYNCHARTWIDGET_H
 
-#define PERIOD 30
-
 #include <QChart>
 #include <QChartView>
 #include <QDateTime>
@@ -12,24 +10,25 @@
 #include <QValueAxis>
 
 #include "Archive.h"
+#include "Cache.h"
 #include "CurrencyRate.h"
 
 class DynChartWidget : public QChartView {
    private:
-    int _idx_;
+    int idx_;
 
-    Archive _archive_;
-    QChart* _chart_;
-    QLineSeries* _series_;
-    QDateTimeAxis* _axis_x_;
-    QValueAxis* _axis_y_;
+    Archive archive_;
+    QChart* chart_;
+    QLineSeries* series_;
+    QDateTimeAxis* axis_x_;
+    QValueAxis* axis_y_;
 
     void populateSeries();
 
    public:
-    DynChartWidget(const int& idx, Archive& cash);
+    DynChartWidget(const int& idx, Cache& cache);
 
-    void refresh(int period, Archive& cash);
+    void refresh(int period, Cache& cache);
 };
 
 #endif  // DYNCHARTWIDGET_H

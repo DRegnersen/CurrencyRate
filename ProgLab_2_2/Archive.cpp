@@ -1,9 +1,22 @@
 #include "Archive.h"
 
+Archive::Archive(const Archive& other) {
+    prev_ = other.prev_;
+    size_ = other.size_;
+    capacity_ = other.capacity_;
+    rates_ = other.rates_;
+}
+
+Archive::Archive(QUrl url, unsigned long long size) {
+    capacity_ = 0;
+    prev_ = url;
+    add(size);
+}
+
 void Archive::add(const unsigned long long& number) {
     bool downloaded = false;
-    _capacity_ += number;
-    _size_ = _capacity_;
+    capacity_ += number;
+    size_ = capacity_;
 
     for (size_t i = 0; i < number; i++) {
         if (i == 0) {
@@ -11,22 +24,22 @@ void Archive::add(const unsigned long long& number) {
                         "processes";
         }
 
-        if (!_prev_.toString().contains("https:")) {
-            _prev_ = QUrl("https:" + _prev_.toString());
+        if (!prev_.toString().contains("https:")) {
+            prev_ = QUrl("https:" + prev_.toString());
         }
 
-        CurrencyRate rate(_prev_);
+        CurrencyRate rate(prev_);
         rate.validateRate();
 
-        _rates_.push_back(rate);
+        rates_.push_back(rate);
         qDebug() << "<Archive> Downloading: "
                  << (int)(((double)(i + 1) / (double)number) * 100) << "%";
 
-        _prev_ = rate.get_PreviousURL();
+        prev_ = rate.get_PreviousURL();
 
         if (i != number - 1) {
-            _timer_.start(INTERVAL);
-            _timer_.stop();
+            timer_.start(LOAD_INTERVAL);
+            timer_.stop();
         } else {
             downloaded = true;
         }
@@ -37,56 +50,45 @@ void Archive::add(const unsigned long long& number) {
     }
 }
 
-Archive::Archive(QUrl url, unsigned long long size) {
-    _capacity_ = 0;
-    _prev_ = url;
-
-    add(size);
-}
-
 Archive& Archive::operator=(const Archive& other) {
-    _rates_.clear();
-    _prev_ = other._prev_;
-    _size_ = other._size_;
-    _capacity_ = other._capacity_;
-
-    for (const CurrencyRate& rate : other._rates_) {
-        _rates_.push_back(rate);
-    }
+    prev_ = other.prev_;
+    size_ = other.size_;
+    capacity_ = other.capacity_;
+    rates_ = other.rates_;
 
     return *this;
 }
 
 CurrencyRate& Archive::operator[](const unsigned long long& idx) {
-    if (idx >= _size_) {
+    if (idx >= size_) {
         qDebug() << "<Archive> Index is out of range";
         static CurrencyRate error_rate;
         return error_rate;
     }
-    return _rates_[idx];
+    return rates_[idx];
 }
 
-unsigned long long Archive::size() const { return _size_; }
+unsigned long long Archive::size() const { return size_; }
 
 void Archive::setSize(unsigned long long size) {
-    if (size <= _capacity_) {
-        _size_ = size;
+    if (size <= capacity_) {
+        size_ = size;
         return;
     }
 
-    add(size - _size_);
+    add(size - size_);
 }
 
-bool Archive::isEmpty() { return _size_ == 0; }
+bool Archive::isEmpty() { return size_ == 0; }
 
 double Archive::min(const int& idx) {
     double min = -1;
 
-    for (size_t i = 0; i < _size_; i++) {
+    for (size_t i = 0; i < size_; i++) {
         if (min < 0) {
-            min = _rates_[i].at(idx).get_Value();
+            min = rates_[i].at(idx).get_Value();
         } else {
-            min = std::min(min, _rates_[i].at(idx).get_Value());
+            min = std::min(min, rates_[i].at(idx).get_Value());
         }
     }
 
@@ -96,15 +98,50 @@ double Archive::min(const int& idx) {
 double Archive::max(const int& idx) {
     double max = -1;
 
-    for (size_t i = 0; i < _size_; i++) {
+    for (size_t i = 0; i < size_; i++) {
         if (max < 0) {
-            max = _rates_[i].at(idx).get_Value();
+            max = rates_[i].at(idx).get_Value();
         } else {
-            max = std::max(max, _rates_[i].at(idx).get_Value());
+            max = std::max(max, rates_[i].at(idx).get_Value());
         }
     }
 
     return max;
 }
 
-double max(const int& idx);
+QString Archive::freshness() { return rates_[0].get_Date(); }
+
+void Archive::refresh() {
+    QUrl actual_url = MAINURL;
+    QVector<CurrencyRate> fresh_rates;
+
+    qDebug() << "<Archive> Updating...";
+
+    while (true) {
+        if (!actual_url.toString().contains("https:")) {
+            actual_url = QUrl("https:" + prev_.toString());
+        }
+
+        CurrencyRate rate(actual_url);
+        rate.validateRate();
+
+        QDateTime start_date =
+            QDateTime::fromString(freshness().left(10), "yyyy-MM-dd");
+        QDateTime end_date =
+            QDateTime::fromString(rate.get_Date().left(10), "yyyy-MM-dd");
+
+        if (start_date.daysTo(end_date) <= 0) {
+            break;
+        }
+
+        fresh_rates.push_back(rate);
+        timer_.start(LOAD_INTERVAL);
+        timer_.stop();
+    }
+
+    for (int i = 0; i < fresh_rates.size(); i++) {
+        rates_.pop_back();
+    }
+    rates_ = fresh_rates + rates_;
+    prev_ = rates_[size_ - 1].get_PreviousURL();
+}

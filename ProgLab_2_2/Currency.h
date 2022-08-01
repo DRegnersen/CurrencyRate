@@ -6,15 +6,17 @@
 
 class Currency {
    private:
-    QString _ID_;
-    QString _NumCode_;
-    QString _CharCode_;
-    int _Nominal_;
-    QString _Name_;
-    double _Value_;
-    double _Previous_;
+    QString ID_;
+    QString NumCode_;
+    QString CharCode_;
+    int Nominal_;
+    QString Name_;
+    double Value_;
+    double Previous_;
 
    public:
+    Currency(QVector<QString> data);
+
     Currency(QJsonObject data);
 
     Currency(const Currency& other);

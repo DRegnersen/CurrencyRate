@@ -7,46 +7,53 @@
 
 CurrencyRate::CurrencyRate(QObject *parent) : QObject(parent) {}
 
+CurrencyRate::CurrencyRate(QString Date, QString PreviousDate, QUrl PreviousURL,
+                           QString Timestamp, QVector<Currency> Valute,
+                           QObject *parent)
+    : QObject(parent) {
+    Date_ = Date;
+    PreviousDate_ = PreviousDate;
+    PreviousURL_ = PreviousURL;
+    Timestamp_ = Timestamp;
+    Valute_ = Valute;
+}
+
 CurrencyRate::CurrencyRate(const CurrencyRate &other, QObject *parent)
     : QObject(parent) {
-    _Date_ = other._Date_;
-    _PreviousDate_ = other._PreviousDate_;
-    _PreviousURL_ = other._PreviousURL_;
-    _Timestamp_ = other._Timestamp_;
-    _Valute_.clear();
-
-    for (const Currency &currency : other._Valute_) {
-        _Valute_.push_back(currency);
-    }
+    Date_ = other.Date_;
+    PreviousDate_ = other.PreviousDate_;
+    PreviousURL_ = other.PreviousURL_;
+    Timestamp_ = other.Timestamp_;
+    Valute_ = other.Valute_;
 }
 
 CurrencyRate::CurrencyRate(QUrl url, QObject *parent) : QObject(parent) {
-    _manager_ = new QNetworkAccessManager;
+    manager_ = new QNetworkAccessManager;
 
-    connect(_manager_, &QNetworkAccessManager::finished, this,
+    connect(manager_, &QNetworkAccessManager::finished, this,
             &CurrencyRate::parseJson);
 
-    connect(_manager_, &QNetworkAccessManager::finished, &_waiting_,
+    connect(manager_, &QNetworkAccessManager::finished, &waiting_,
             &QEventLoop::quit);
 
-    _manager_->get(QNetworkRequest(url));
+    manager_->get(QNetworkRequest(url));
 }
 
 void CurrencyRate::parseJson(QNetworkReply *reply) {
-    if (!(_error_code_ = reply->error())) {
+    if (!(error_code_ = reply->error())) {
         QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
         QJsonObject root = document.object();
         QJsonObject js_valute = root.value(root.keys().at(4)).toObject();
 
-        _Date_ = root.value(root.keys().at(0)).toString();
-        _PreviousDate_ = root.value(root.keys().at(1)).toString();
-        _PreviousURL_ = root.value(root.keys().at(2)).toString();
-        _Timestamp_ = root.value(root.keys().at(3)).toString();
+        Date_ = root.value(root.keys().at(0)).toString();
+        PreviousDate_ = root.value(root.keys().at(1)).toString();
+        PreviousURL_ = root.value(root.keys().at(2)).toString();
+        Timestamp_ = root.value(root.keys().at(3)).toString();
 
         QJsonObject js_current;
         for (int i = 0; i < js_valute.size(); i++) {
             js_current = js_valute.value(js_valute.keys().at(i)).toObject();
-            _Valute_.push_back(Currency(js_current));
+            Valute_.push_back(Currency(js_current));
         }
     } else {
         qDebug() << "<CurrencyRate> Reply was not transmitted";
@@ -55,33 +62,29 @@ void CurrencyRate::parseJson(QNetworkReply *reply) {
 }
 
 CurrencyRate &CurrencyRate::operator=(const CurrencyRate &other) {
-    _Date_ = other._Date_;
-    _PreviousDate_ = other._PreviousDate_;
-    _PreviousURL_ = other._PreviousURL_;
-    _Timestamp_ = other._Timestamp_;
-    _Valute_.clear();
-
-    for (const Currency &currency : other._Valute_) {
-        _Valute_.push_back(currency);
-    }
+    Date_ = other.Date_;
+    PreviousDate_ = other.PreviousDate_;
+    PreviousURL_ = other.PreviousURL_;
+    Timestamp_ = other.Timestamp_;
+    Valute_ = other.Valute_;
 
     return *this;
 }
 
-void CurrencyRate::validateRate() { _waiting_.exec(); }
+void CurrencyRate::validateRate() { waiting_.exec(); }
 
-unsigned int CurrencyRate::size() const { return _Valute_.size(); }
+unsigned int CurrencyRate::size() const { return Valute_.size(); }
 
 Currency CurrencyRate::at(const unsigned int &idx) const {
-    return _Valute_[idx];
+    return Valute_[idx];
 }
 
-QString CurrencyRate::get_Date() const { return _Date_; }
+QString CurrencyRate::get_Date() const { return Date_; }
 
-QString CurrencyRate::get_PreviousDate() const { return _PreviousDate_; }
+QString CurrencyRate::get_PreviousDate() const { return PreviousDate_; }
 
-QUrl CurrencyRate::get_PreviousURL() const { return _PreviousURL_; }
+QUrl CurrencyRate::get_PreviousURL() const { return PreviousURL_; }
 
-QString CurrencyRate::get_Timestamp() const { return _Timestamp_; }
+QString CurrencyRate::get_Timestamp() const { return Timestamp_; }
 
-int CurrencyRate::error() const { return _error_code_; }
+int CurrencyRate::error() const { return error_code_; }
