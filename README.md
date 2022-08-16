@@ -1,4 +1,5 @@
 # Currency Rate
- Currency rate viewing application for the second programing lab
-![CurrencyRate_table](https://user-images.githubusercontent.com/89846167/184835478-d8f3677b-4b9f-4e10-af19-60126a004615.jpg)
-![CurrencyRate_dynamics](https://user-images.githubusercontent.com/89846167/184835536-f8b64eec-4be3-4367-a5ae-85d976cdf7f7.jpg)
+![CurrencyRate_dynamics_2](https://user-images.githubusercontent.com/89846167/184885103-cf6b8556-ce4e-4b02-be15-50e7dec57daf.jpg)
+<h1 align="left">Приложение для просмотра актуальных курсов</h1>
+С помощью таблицы можно следить за изменением динамики роста/снижения цены в рублях 34 мировых валют. Данные берутся на основе последней сводки Центробанка. Приложение также позволяет рассмотреть график перемены конкретного курса за любой период вплоть до 1 года.
+Кэширование уже скачанных данных, содержащих цены валют за некоторый набор дней, позволяет экономить время при следующем входе в приложение.
